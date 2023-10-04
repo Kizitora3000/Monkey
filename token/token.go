@@ -33,14 +33,17 @@ const (
 	LET      = "LET"
 )
 
-// 予約語と識別子（変数名, 関数名, etc.）
+// 予約語の定義
 var keywords = map[string]TokenType{
 	"fn":  FUNCTION,
 	"let": LET,
 }
 
+// 予約語と識別子（変数名, 関数名, etc.）の識別を行う
+// 予約語ならそのトークンを、そうでなければ識別子を意味する"IDENT"を返す
 func LookupIdent(ident string) TokenType {
 	if tok, ok := keywords[ident]; ok {
-
+		return tok
 	}
+	return IDENT
 }
