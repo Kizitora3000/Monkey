@@ -77,3 +77,20 @@ func (l *Lexer) NextToken() token.Token {
 	l.readChar()
 	return tok
 }
+
+// 例：「let abc ...」があったとき、position = 'a'の位置、l.position = 'c'の位置となり、その範囲のabcを取得する
+func (l *Lexer) readIdentifier() string {
+	// 最初の基準となる位置を把握しておく[]
+	position := l.position
+
+	// 識別子を非英字になるまで読み進める
+	for isLetter(l.ch) {
+		l.readChar()
+	}
+
+	return l.input[position:l.position]
+}
+
+func isLetter(ch byte) bool {
+	return 'a' <= ch && ch <= 'z' || 'A' <= ch && ch <= 'Z' || ch == '_'
+}
