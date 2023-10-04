@@ -68,7 +68,8 @@ func (l *Lexer) NextToken() token.Token {
 		// letter: 英字
 		if isLetter(l.ch) {
 			tok.Literal = l.readIdentifier()
-			return tok
+			tok.Type = token.LookupIdent(tok.Literal)
+			return tok // readIdentifier() で既に readChar() を実行させているためreturnで脱出させる
 		} else {
 			tok = newToken(token.ILLEGAL, l.ch)
 		}
@@ -80,7 +81,7 @@ func (l *Lexer) NextToken() token.Token {
 
 // 例：「let abc ...」があったとき、position = 'a'の位置、l.position = 'c'の位置となり、その範囲のabcを取得する
 func (l *Lexer) readIdentifier() string {
-	// 最初の基準となる位置を把握しておく[]
+	// 最初の基準となる位置を把握しておく
 	position := l.position
 
 	// 識別子を非英字になるまで読み進める
