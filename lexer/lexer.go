@@ -58,12 +58,20 @@ func (l *Lexer) NextToken() token.Token {
 	case '+':
 		tok = newToken(token.PLUS, l.ch)
 	case '{':
-		tok = newToken(token.LBACE, l.ch)
+		tok = newToken(token.LBRACE, l.ch)
 	case '}':
-		tok = newToken(token.RBACE, l.ch)
+		tok = newToken(token.RBRACE, l.ch)
 	case 0:
 		tok.Literal = ""
 		tok.Type = token.EOF
+	default:
+		// letter: 英字
+		if isLetter(l.ch) {
+			tok.Literal = l.readIdentifier()
+			return tok
+		} else {
+			tok = newToken(token.ILLEGAL, l.ch)
+		}
 	}
 
 	l.readChar()

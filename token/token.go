@@ -25,8 +25,8 @@ const (
 
 	LPAREN = "("
 	RPAREN = ")"
-	LBACE  = "{"
-	RBACE  = "}"
+	LBRACE = "{"
+	RBRACE = "}"
 
 	// キーワード(予約語)
 	FUNCTION = "FUNCTION"
