@@ -43,6 +43,8 @@ const (
 	IF       = "IF"
 	ELSE     = "ELSE"
 	RETURN   = "RETURN"
+	EQ       = "=="
+	NOT_EQ   = "!="
 )
 
 // 予約語の定義
