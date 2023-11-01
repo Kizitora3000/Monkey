@@ -3,8 +3,8 @@ package token
 type TokenType string
 
 type Token struct {
-	Type    TokenType
-	Literal string
+	Type    TokenType // トークンが数(INT)なのか？変数(IDENT)なのか？キーワード(FUNCTION, LET, etc.)なのか、という種類を示す
+	Literal string    // トークンの内容が入る。数ならその値、変数なら変数名が入る。キーワードはTokenTypeと同じ
 }
 
 const (
