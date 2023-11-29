@@ -19,6 +19,14 @@ func New(l *lexer.Lexer) *Parser {
 	p := &Parser{l: l}
 
 	// 現在調べているトークンだけだと十分な情報が得られない場合があるので、次のトークンも調べるようにする
+	/* 十分な情報を得られない例
+	5; なのか 5 + 5; なのかを判別するとき．;があるから処理を終えるのか，+だから演算子に関連したパーサを呼び出すのか
+	*/
+
+	/* let a = 5 の例
+	1回目のnextToken: p.curlToken = nil, p.peekToken = p.peekToken() = let
+	2回目のnextToken: p.curlToken = let, p.peekToken = p.peekToken() = a
+	*/
 	p.nextToken()
 	p.nextToken()
 

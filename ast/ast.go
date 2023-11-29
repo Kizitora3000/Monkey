@@ -19,18 +19,18 @@ type Expression interface {
 }
 
 type Program struct {
-	Statement []Statement
+	Statements []Statement
 }
 
 func (p *Program) TokenLiteral() string {
-	if len(p.Statement) > 0 {
-		return p.Statement[0].TokenLiteral()
+	if len(p.Statements) > 0 {
+		return p.Statements[0].TokenLiteral()
 	} else {
 		return ""
 	}
 }
 
-// let文の定義(let <identifier> = <expression>)における右側の式を示すフィールドを LetStatement として定義する
+// let文の定義
 type LetStatement struct {
 	Toekn token.Token // <expression>のトークン
 	Name  *Identifier // <expression>に変数名が入るけ０素
