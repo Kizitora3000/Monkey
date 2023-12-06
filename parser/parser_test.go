@@ -8,15 +8,16 @@ import (
 
 func TestLetStatements(t *testing.T) {
 	input := `
-	let x = 5;
-	let y = 10;
-	let foobar = 83883;
+	let x 5;
+	let = 10;
+	let 83883;
 	`
 
 	l := lexer.New(input)
 	p := New(l) // Parserのコンストラクタを呼び出している
 
 	program := p.ParseProgram()
+	checkParserErrors(t, p)
 
 	if program == nil {
 		t.Fatalf("ParseProgram() returned nil")
@@ -49,6 +50,9 @@ func testLetStatement(t *testing.T, s ast.Statement, name string) bool {
 		return false
 	}
 
+	// 型アサーションを行う
+	// 型アサーションとはインターフェース値が特定の型を持っているかどうかをチェックしている
+	// sという名前のインターフェースがLetStatemetn型を所持しているかどうをチェックしている
 	letStmt, ok := s.(*ast.LetStatement)
 	if !ok {
 		t.Errorf("s not *ast.LetStatement. got=%T", s)
@@ -67,4 +71,17 @@ func testLetStatement(t *testing.T, s ast.Statement, name string) bool {
 	}
 
 	return true
+}
+
+func checkParserErrors(t *testing.T, p *Parser) {
+	errors := p.Errors()
+	if len(errors) == 0 {
+		return
+	}
+
+	t.Errorf("parser has %d errors", len(errors))
+	for _, msg := range errors {
+		t.Errorf("parser error: %q", msg)
+	}
+	t.FailNow()
 }

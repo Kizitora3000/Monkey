@@ -32,13 +32,13 @@ func (p *Program) TokenLiteral() string {
 
 // let文の定義
 type LetStatement struct {
-	Toekn token.Token // <expression>のトークン
+	Token token.Token // <expression>のトークン
 	Name  *Identifier // <expression>に変数名が入るけ０素
 	Value Expression  // <expression>に評価した結果の値が入るケース
 }
 
 func (ls *LetStatement) statementNode()       {}
-func (ls *LetStatement) TokenLiteral() string { return ls.Toekn.Literal }
+func (ls *LetStatement) TokenLiteral() string { return ls.Token.Literal }
 
 // Monkeyにおける識別子は値を生成すると定義している (つまり、識別子はStatementではなくExpression)
 type Identifier struct {
