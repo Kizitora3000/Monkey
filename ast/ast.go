@@ -40,6 +40,14 @@ type LetStatement struct {
 func (ls *LetStatement) statementNode()       {}
 func (ls *LetStatement) TokenLiteral() string { return ls.Token.Literal }
 
+type ReturnStatement struct {
+	Token       token.Token // 'return' トークン
+	ReturnValue Expression
+}
+
+func (rs *ReturnStatement) statementNode()       {}
+func (rs *ReturnStatement) TokenLiteral() string { return rs.Token.Literal }
+
 // Monkeyにおける識別子は値を生成すると定義している (つまり、識別子はStatementではなくExpression)
 type Identifier struct {
 	Token token.Token
