@@ -35,8 +35,11 @@ type Parser struct {
 	curToken  token.Token
 	peekToken token.Token
 
+	// -5 や !hoge などの前置演算子をパースするために，トークンと対応したパース関数をmapで紐づける
 	prefixParseFns map[token.TokenType]prefixParseFn
-	infixParseFns  map[token.TokenType]infixParseFn
+
+	// 5+3 や 2 > 1 などの中値演算子をパースするために，トークンと対応したパース関数をmapで紐づける
+	infixParseFns map[token.TokenType]infixParseFn
 }
 
 // Parserを作るためのコンストラクタ
@@ -49,6 +52,8 @@ func New(l *lexer.Lexer) *Parser {
 	p.prefixParseFns = make(map[token.TokenType]prefixParseFn)
 	p.registerPrefix(token.IDENT, p.parseIdentifier)
 	p.registerPrefix(token.INT, p.parseIntegerLiteral)
+	p.registerPrefix(token.BANG, p.parsePrefixExpression)
+	p.registerPrefix(token.MINUS, p.parsePrefixExpression)
 
 	// 現在調べているトークンだけだと十分な情報が得られない場合があるので、次のトークンも調べるようにする
 	/* 十分な情報を得られない例
@@ -164,14 +169,33 @@ func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
 	return stmt
 }
 
+func (p *Parser) noPrefixParseFnError(t token.TokenType) {
+	msg := fmt.Sprintf("no prefix parse function for %s found", t)
+	p.errors = append(p.errors, msg)
+}
+
 func (p *Parser) parseExpression(precedence int) ast.Expression {
 	prefix := p.prefixParseFns[p.curToken.Type]
 	if prefix == nil {
+		p.noPrefixParseFnError(p.curToken.Type)
 		return nil
 	}
 	leftExp := prefix()
 
 	return leftExp
+}
+
+func (p *Parser) parsePrefixExpression() ast.Expression {
+	expression := &ast.PrefixExpression{
+		Token:    p.curToken,
+		Operator: p.curToken.Literal,
+	}
+
+	p.nextToken()
+
+	expression.Right = p.parseExpression(PREFIX)
+
+	return expression
 }
 
 func (p *Parser) parseIntegerLiteral() ast.Expression {
