@@ -84,6 +84,10 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerInfix(token.LT, p.parseInfixExpression)
 	p.registerInfix(token.GT, p.parseInfixExpression)
 
+	// 呼び出し式 add(2, 3) における中値演算子"("を登録する
+	// これは add という識別子(関数を束縛している) と 2,3 という引数リストの2つの式を持つ必要があるので，中値演算子となる
+	p.registerInfix(token.LPAREN, p.parseCallExpression)
+
 	// 現在調べているトークンだけだと十分な情報が得られない場合があるので、次のトークンも調べるようにする
 	/* 十分な情報を得られない例
 	5; なのか 5 + 5; なのかを判別するとき．;があるから処理を終えるのか，+だから演算子に関連したパーサを呼び出すのか
@@ -398,6 +402,44 @@ func (p *Parser) parseFunctionParameters() []*ast.Identifier {
 	}
 
 	return identifiers
+}
+
+func (p *Parser) parseCallExpression(function ast.Expression) ast.Expression {
+	// CallExpression ノードの作成
+	exp := &ast.CallExpression{Token: p.curToken, Function: function}
+
+	// CallExpression ノードの Arguments に 関数呼び出しの引数部分を格納
+	exp.Arguments = p.parseCallArguments()
+	return exp
+}
+
+// ここの処理は parseFunctionParameters関数とほぼ同じ
+// 違いは2つある．
+// 1つ目：引数にあたる部分に識別子や関数リテラルなどいろんなものが入るので，parseExpressionを使っていパン化しているところ
+// 2つ目：返り値が []*ast.Identifier ではなく []ast.Expression となる
+// 関数リテラルの定義時は識別子だけだが，関数呼び出しでは識別子だけでなく，引数に関数リテラルを入れることもできる
+func (p *Parser) parseCallArguments() []ast.Expression {
+	args := []ast.Expression{}
+
+	if p.peekTokenIs(token.RPAREN) {
+		p.nextToken()
+		return args
+	}
+
+	p.nextToken()
+	args = append(args, p.parseExpression(LOWEST))
+
+	for p.peekTokenIs(token.COMMA) {
+		p.nextToken()
+		p.nextToken()
+		args = append(args, p.parseExpression(LOWEST))
+	}
+
+	if !p.expectPeek(token.RPAREN) {
+		return nil
+	}
+
+	return args
 }
 
 func (p *Parser) parseIntegerLiteral() ast.Expression {

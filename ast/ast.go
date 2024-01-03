@@ -238,3 +238,31 @@ func (fl *FunctionLiteral) String() string {
 
 	return out.String()
 }
+
+// 詳しくは p.105
+// 関数の呼び出し式 <expression>(<comma separated expressions>)
+// <expression>には識別子のほかに関数リテラルも入る (例： 識別子: add(2, 3), 関数リテラル: fn(x,y){x+y;}(2, 3) )
+// <expression>(式)となるのは，識別子が何かしらの関数を束縛しているから．識別子は値として関数を生成する (例: 識別子addは関数addを束縛している)
+type CallExpression struct {
+	Token     token.Token // "(" トークン
+	Function  Expression  // 識別子または関数リテラル
+	Arguments []Expression
+}
+
+func (ce *CallExpression) expressionNode()      {}
+func (ce *CallExpression) TokenLiteral() string { return ce.Token.Literal }
+func (ce *CallExpression) String() string {
+	var out bytes.Buffer
+
+	args := []string{}
+	for _, a := range ce.Arguments {
+		args = append(args, a.String())
+	}
+
+	out.WriteString(ce.Function.String())
+	out.WriteString("(")
+	out.WriteString(strings.Join(args, ", "))
+	out.WriteString(")")
+
+	return out.String()
+}
